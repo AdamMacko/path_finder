@@ -4,7 +4,9 @@ import Sidebar from "./components/sideBar";
 export default function Home() {
   return (
     
-   <p>PathFinder Home Page</p>
+   <h1 className="text-3xl font-semibold tracking-tight">
+          homepage
+        </h1>
     
   );
 }

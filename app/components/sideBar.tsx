@@ -2,16 +2,9 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  History,
-  User,
-  LifeBuoy,
-  Menu,
-  Building,
-  Building2Icon,
-} from "lucide-react";
+import { LayoutDashboard, LifeBuoy, Menu, Building2Icon, Map } from "lucide-react";
 
 const Sidebar = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -19,8 +12,8 @@ const Sidebar = () => {
 
   const items = [
     { to: "/", label: "Prehľad", icon: LayoutDashboard },
-    { to: "/building_complex", label: "Budovy areálu", icon: Building2Icon },
-    { to: "/my-firm", label: "Moja firma", icon: User },
+    { to: "/building_complex", label: "Outdoor Mapa", icon: Map },
+    { to: "/my-firm", label: "Správa budov", icon: Building2Icon },
     { to: "/pomocnik", label: "Pomocník", icon: LifeBuoy },
   ];
 
@@ -38,6 +31,9 @@ const Sidebar = () => {
         ${sidebarOpen ? "fixed left-0 top-0 w-[260px]" : "w-16"}`}
       >
         <div className="pt-8 flex flex-col items-center h-[60px]">
+          {/* LOGO */}
+          <Image src="/logo.svg" alt="Logo" width={32} height={32} priority />
+
           <button
             onClick={() => setSidebarOpen((p) => !p)}
             className="w-12 py-3 flex items-center justify-center rounded-lg hover:bg-[#f3f6f9]"
@@ -56,22 +52,20 @@ const Sidebar = () => {
                 key={to}
                 href={to}
                 onClick={() => setSidebarOpen(false)}
-                className={`group relative flex items-center rounded-xl px-3.5 py-3 transition ${
-                  isActive
+                className={`group relative flex items-center rounded-xl px-3.5 py-3 transition ${isActive
                     ? "bg-[#0075be] text-[#FFFFFF]"
                     : "text-[#777777] hover:bg-[#f3f6f9]"
-                }`}
+                  }`}
               >
                 <div className="w-6 flex justify-center">
                   <Icon size={18} />
                 </div>
 
                 <span
-                  className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-out ${
-                    sidebarOpen
+                  className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-out ${sidebarOpen
                       ? "max-w-[160px] opacity-100 translate-x-0 mx-6 ml-10"
                       : "max-w-0 opacity-0 -translate-x-2 ml-0"
-                  }`}
+                    }`}
                 >
                   {label}
                 </span>
