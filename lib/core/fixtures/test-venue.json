@@ -1,0 +1,94 @@
+{
+  "$schema": "../schema/venue.schema.json",
+  "schemaVersion": 1,
+  "id": "test-areal",
+  "name": "Testovací areál (vymyslený)",
+  "defaults": { "floorHeight": 3.5, "wallTolerance": 0.3, "speed": 1.3 },
+  "buildings": [
+    { "id": "A", "name": "Administratívna budova" },
+    { "id": "B", "name": "Výrobná hala" }
+  ],
+  "levels": [
+    { "id": "OUT", "ordinal": 0, "name": "Exteriér", "svg": "OUT.svg" },
+    { "id": "A-0", "building": "A", "ordinal": 0, "name": "A – prízemie", "svg": "A-0.svg",
+      "transform": { "scale": 0.1, "rotation": 0, "offset": [0, 0] } },
+    { "id": "A-1", "building": "A", "ordinal": 1, "name": "A – 1. poschodie", "svg": "A-1.svg",
+      "transform": { "scale": 0.1, "rotation": 0, "offset": [0, 0] } },
+    { "id": "B-0", "building": "B", "ordinal": 0, "name": "B – hala", "svg": "B-0.svg",
+      "transform": { "scale": 1, "rotation": 90, "offset": [70, 0] } }
+  ],
+  "spaces": [
+    { "id": "OUT-chodnik", "level": "OUT", "type": "walkway", "name": "Hlavný chodník", "criteria": { "preferred": true } },
+    { "id": "OUT-nadvorie", "level": "OUT", "type": "courtyard", "name": "Nádvorie (pohyb vozíkov)", "criteria": { "avoid": true } },
+    { "id": "OUT-parkovisko", "level": "OUT", "type": "parking", "name": "Parkovisko" },
+
+    { "id": "A-0-chodba", "level": "A-0", "type": "corridor", "name": "Chodba" },
+    { "id": "A-0-vstup", "level": "A-0", "type": "lobby", "name": "Recepcia" },
+    { "id": "A-0-kancelaria", "level": "A-0", "type": "office", "name": "Kancelária" },
+    { "id": "A-0-jedalen", "level": "A-0", "type": "room", "name": "Jedáleň" },
+    { "id": "A-0-schody", "level": "A-0", "type": "stairs" },
+    { "id": "A-0-vytah", "level": "A-0", "type": "elevator" },
+
+    { "id": "A-1-chodba", "level": "A-1", "type": "corridor", "name": "Chodba" },
+    { "id": "A-1-zasadacka", "level": "A-1", "type": "room", "name": "Zasadačka" },
+    { "id": "A-1-serverovna", "level": "A-1", "type": "room", "name": "Serverovňa" },
+    { "id": "A-1-schody", "level": "A-1", "type": "stairs" },
+    { "id": "A-1-vytah", "level": "A-1", "type": "elevator" },
+
+    { "id": "B-0-vstup", "level": "B-0", "type": "lobby", "name": "Vstup do haly" },
+    { "id": "B-0-hala", "level": "B-0", "type": "hall", "name": "Montážna hala", "zone": "vyroba" },
+    { "id": "B-0-sklad", "level": "B-0", "type": "warehouse", "name": "Sklad", "zone": "vyroba" }
+  ],
+  "openings": [
+    { "id": "v-nadvorie-chodnik", "between": ["OUT-nadvorie", "OUT-chodnik"], "type": "virtual" },
+    { "id": "v-parkovisko-chodnik", "between": ["OUT-parkovisko", "OUT-chodnik"], "type": "virtual" },
+
+    { "id": "d-A-vstup", "between": ["OUT-chodnik", "A-0-vstup"], "type": "door" },
+    { "id": "d-A-bocne", "between": ["A-0-chodba", "OUT-nadvorie"], "type": "door", "oneWay": true },
+    { "id": "d-A0-vstup-chodba", "between": ["A-0-vstup", "A-0-chodba"], "type": "door" },
+    { "id": "d-A0-kancelaria", "between": ["A-0-chodba", "A-0-kancelaria"], "type": "door" },
+    { "id": "d-A0-jedalen", "between": ["A-0-chodba", "A-0-jedalen"], "type": "door" },
+    { "id": "d-A0-schody", "between": ["A-0-chodba", "A-0-schody"], "type": "door" },
+    { "id": "d-A0-vytah", "between": ["A-0-chodba", "A-0-vytah"], "type": "door" },
+
+    { "id": "d-A1-zasadacka", "between": ["A-1-chodba", "A-1-zasadacka"], "type": "door" },
+    { "id": "d-A1-serverovna", "between": ["A-1-chodba", "A-1-serverovna"], "type": "door", "rules": ["karta", "udrzba"] },
+    { "id": "d-A1-schody", "between": ["A-1-chodba", "A-1-schody"], "type": "door" },
+    { "id": "d-A1-vytah", "between": ["A-1-chodba", "A-1-vytah"], "type": "door" },
+
+    { "id": "d-B-vstup", "between": ["OUT-chodnik", "B-0-vstup"], "type": "door" },
+    { "id": "d-B-turniket", "between": ["B-0-vstup", "B-0-hala"], "type": "turnstile", "rules": ["karta"] },
+    { "id": "d-B-vrata", "between": ["OUT-nadvorie", "B-0-hala"], "type": "gate", "rules": ["karta"] },
+    { "id": "d-B-sklad", "between": ["B-0-hala", "B-0-sklad"], "type": "door" }
+  ],
+  "vertical": [
+    { "id": "schody-A", "type": "stairs", "spaces": { "A-0": "A-0-schody", "A-1": "A-1-schody" } },
+    { "id": "vytah-A", "type": "elevator", "spaces": { "A-0": "A-0-vytah", "A-1": "A-1-vytah" } }
+  ],
+  "pois": [
+    { "id": "poi-parkovisko", "space": "OUT-parkovisko", "category": "parking", "name": "Parkovisko pre návštevy" },
+    { "id": "poi-recepcia", "space": "A-0-vstup", "category": "reception", "name": "Recepcia" },
+    { "id": "poi-jedalen", "space": "A-0-jedalen", "category": "canteen", "name": "Jedáleň" },
+    { "id": "poi-zasadacka", "space": "A-1-zasadacka", "category": "meeting_room", "name": "Zasadačka" },
+    { "id": "poi-serverovna", "space": "A-1-serverovna", "category": "server_room", "name": "Serverovňa", "internal": true },
+    { "id": "poi-montaz", "space": "B-0-hala", "category": "workplace", "name": "Montážna linka" },
+    { "id": "poi-sklad", "space": "B-0-sklad", "category": "warehouse", "name": "Sklad náhradných dielov", "internal": true }
+  ],
+  "rules": [
+    { "id": "karta", "type": "card", "name": "Prístupová karta" },
+    { "id": "zamestnanci", "type": "role", "name": "Iba zamestnanci", "roles": ["employee", "maintenance", "temp_worker"] },
+    { "id": "udrzba", "type": "role", "name": "Iba údržba", "roles": ["maintenance"] },
+    { "id": "smena", "type": "time", "name": "Pracovná zmena", "days": ["Mo", "Tu", "We", "Th", "Fr"], "from": "05:45", "to": "22:15" },
+    { "id": "oopp", "type": "ppe", "name": "OOPP povinné" }
+  ],
+  "zones": [
+    { "id": "vyroba", "name": "Výroba", "rules": ["zamestnanci", "oopp", "smena"] }
+  ],
+  "profiles": [
+    { "id": "visitor", "name": "Návštevník", "roles": ["visitor"], "weights": { "distance": 1 } },
+    { "id": "employee", "name": "Zamestnanec", "roles": ["employee"], "card": true, "ppe": true, "weights": { "distance": 1, "avoid": 0.5 } },
+    { "id": "temp_worker", "name": "Brigádnik", "roles": ["temp_worker"], "card": true, "ppe": true, "weights": { "distance": 1, "avoid": 0.5 } },
+    { "id": "maintenance", "name": "Údržbár", "roles": ["maintenance"], "card": true, "ppe": true, "internal": true, "weights": { "distance": 1, "time": 1 } },
+    { "id": "accessible", "name": "Bezbariérový", "roles": ["visitor"], "require": ["accessible"], "speed": 0.8, "weights": { "distance": 1 } }
+  ]
+}

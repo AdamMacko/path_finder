@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, LifeBuoy, Menu, Building2Icon, Map } from "lucide-react";
+import { LayoutDashboard, Menu, Map, Navigation } from "lucide-react";
 
 const Sidebar = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -12,9 +12,8 @@ const Sidebar = () => {
 
   const items = [
     { to: "/", label: "Prehľad", icon: LayoutDashboard },
-    { to: "/building_complex", label: "Outdoor Mapa", icon: Map },
-    { to: "/my-firm", label: "Správa budov", icon: Building2Icon },
-    { to: "/pomocnik", label: "Pomocník", icon: LifeBuoy },
+    { to: "/navigacia", label: "Navigácia", icon: Navigation },
+    { to: "/building_complex", label: "Import podkladov", icon: Map },
   ];
 
   return (

@@ -11,10 +11,19 @@ import {
 } from "lucide-react";
 import Dock from "../components/dock";
 import { dockItems } from "../components/dockConfig";
+import { OutdoorCanvas } from "../components/outdoorCanvas";
 export default function ImportPage() {
   const [open, setOpen] = React.useState(false);
   const [showOSM, setShowOSM] = React.useState(false);
   const [selected, setSelected] = React.useState<string | null>(null);
+  const [fileName, setFileName] = React.useState<string | null>(null);
+  const [svgContent, setSvgContent] = React.useState<string | undefined>();
+  const [imageUrl, setImageUrl] = React.useState<string | undefined>();
+
+  // Uvoľní blob: URL predchádzajúceho obrázka.
+  React.useEffect(() => () => {
+    if (imageUrl) URL.revokeObjectURL(imageUrl);
+  }, [imageUrl]);
 
   const dropdownRef = React.useRef<HTMLDivElement | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
@@ -45,10 +54,18 @@ export default function ImportPage() {
     setShowOSM(true);
   }
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
+    e.target.value = ""; // rovnaký súbor sa dá vybrať znova
     if (!file) return;
-    console.log("Vybraný súbor:", file);
+    setFileName(file.name);
+    if (file.type === "image/svg+xml" || file.name.toLowerCase().endsWith(".svg")) {
+      setImageUrl(undefined);
+      setSvgContent(await file.text());
+    } else {
+      setSvgContent(undefined);
+      setImageUrl(URL.createObjectURL(file));
+    }
   }
 
   return (
@@ -134,13 +151,17 @@ export default function ImportPage() {
       {selected && (
         <div className="rounded-xl border p-4 bg-gray-50 text-sm break-words">
           Vybraný typ importu: <b>{selected.toUpperCase()}</b>
+          {fileName && <> · súbor <b>{fileName}</b></>}
         </div>
       )}
 
-      {/* Map canvas placeholder */}
-      <div className="h-[450px] sm:h-[500px] lg:h-[650px] border rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 text-sm sm:text-base">
-        Tu sa zobrazí mapa po importe
-      </div>
+      {svgContent || imageUrl ? (
+        <OutdoorCanvas svgContent={svgContent} imageUrl={imageUrl} />
+      ) : (
+        <div className="h-[450px] sm:h-[500px] lg:h-[650px] border rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 text-sm sm:text-base">
+          Tu sa zobrazí mapa po importe
+        </div>
+      )}
 
       {/* OSM Modal */}
       {showOSM && (
@@ -161,7 +182,7 @@ export default function ImportPage() {
               </label>
               <input
                 type="text"
-                placeholder="Napr. Technická univerzita Košice"
+                placeholder="Napr. adresa výrobného areálu"
                 className="mt-1 w-full border rounded-lg px-3 py-2 text-sm"
               />
             </div>
