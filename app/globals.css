@@ -6,10 +6,10 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-plex-sans);
-  --font-mono: var(--font-plex-mono);
+  --font-sans: var(--font-brand-sans);
+  --font-mono: var(--font-brand-mono);
 
-  /* survey palette — the working vocabulary of this UI */
+  /* corporate palette — the working vocabulary of this UI */
   --color-paper: var(--paper);
   --color-surface: var(--surface);
   --color-ink: var(--ink);
@@ -18,6 +18,7 @@
 
   --color-route: var(--route);
   --color-route-soft: var(--route-soft);
+  --color-route-dark: var(--route-dark);
   --color-flag: var(--flag);
   --color-flag-soft: var(--flag-soft);
   --color-stake: var(--stake);
@@ -66,21 +67,26 @@
 :root {
   --radius: 0.5rem;
 
-  /* --- survey palette ------------------------------------------------ */
-  --paper: #eef1f4;       /* app ground — pale drafting-table grey-blue */
-  --surface: #ffffff;     /* panels sit on paper, lifted by a hairline, not a shadow */
-  --ink: #11161d;         /* primary text — near-black with a blue cast */
-  --ink-soft: #596679;    /* secondary text */
-  --line: #dbe1e7;        /* hairline borders, grid rules */
+  /* --- fonts: ANDRITZ CD manual mandates Arial for all digital/MS Office use ----- */
+  --font-brand-sans: Arial, Helvetica, "Segoe UI", sans-serif;
+  --font-brand-mono: ui-monospace, "SFMono-Regular", "Cascadia Code", Consolas, "Courier New", monospace;
 
-  --route: #0068b4;       /* primary accent — the line the pathfinder draws */
-  --route-soft: #e3eef6;
-  --flag: #b8660e;        /* survey-flag amber — needs attention */
-  --flag-soft: #f7ecdd;
-  --stake: #3f7a5c;       /* stake-in-the-ground green — resolved, connected */
-  --stake-soft: #e6efea;
-  --alarm: #b23a33;       /* brick red — blocked, failed */
-  --alarm-soft: #f7e7e5;
+  /* --- ANDRITZ corporate palette (CD manual chapter 4) ---------------- */
+  --paper: #f4f6f8;        /* app ground — light neutral, close to white */
+  --surface: #ffffff;      /* panels sit on paper, lifted by a hairline, not a shadow */
+  --ink: #121417;          /* primary text — ANDRITZ black */
+  --ink-soft: #5b6472;     /* secondary text — neutral grey */
+  --line: #d8dde2;         /* hairline borders, grid rules */
+
+  --route: #0075be;        /* ANDRITZ Blue — primary accent */
+  --route-soft: #e2eef7;
+  --route-dark: #003a70;   /* ANDRITZ Dark Blue — additional corporate color */
+  --flag: #f07e3b;         /* ANDRITZ Signal Orange — needs attention */
+  --flag-soft: #fdece0;
+  --stake: #47a23f;        /* ANDRITZ Signal Green — resolved, connected */
+  --stake-soft: #e7f3e5;
+  --alarm: #bd3a2f;        /* no official ANDRITZ red exists; kept neutral/desaturated to not clash */
+  --alarm-soft: #f8e8e6;
 
   /* --- shadcn-compatible mapping -------------------------------------- */
   --background: var(--paper);

@@ -184,7 +184,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          <div className="bg-ink p-6 rounded-md">
+          <div className="bg-route-dark p-6 rounded-md">
             <h3 className="text-sm font-medium text-white mb-2">Simulácia prostredia</h3>
             <p className="text-sm text-white/60 mb-5 leading-relaxed">
               Overte navigačný model pod rôznymi kritériami — čas, vzdialenosť, prístupové oprávnenia.

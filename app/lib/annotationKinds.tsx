@@ -27,7 +27,7 @@ export const KIND_META: Record<AnnotationKind, KindMeta> = {
     icon: <Building2 size={18} />,
     dockBgClass: "bg-route",
     dotClass: "bg-route",
-    hex: "#0068b4",
+    hex: "#0075be",
     defaultSize: { width: 160, height: 120 },
   },
   parkovisko: {
@@ -37,7 +37,7 @@ export const KIND_META: Record<AnnotationKind, KindMeta> = {
     icon: <SquareParking size={18} />,
     dockBgClass: "bg-ink-soft",
     dotClass: "bg-ink-soft",
-    hex: "#596679",
+    hex: "#5b6472",
     defaultSize: { width: 240, height: 160 },
   },
   vstup: {
@@ -47,7 +47,7 @@ export const KIND_META: Record<AnnotationKind, KindMeta> = {
     icon: <DoorOpen size={18} />,
     dockBgClass: "bg-stake",
     dotClass: "bg-stake",
-    hex: "#3f7a5c",
+    hex: "#47a23f",
     defaultSize: { width: 50, height: 50 },
   },
   ine: {
@@ -57,7 +57,7 @@ export const KIND_META: Record<AnnotationKind, KindMeta> = {
     icon: <Tag size={18} />,
     dockBgClass: "bg-flag",
     dotClass: "bg-flag",
-    hex: "#b8660e",
+    hex: "#f07e3b",
     defaultSize: { width: 100, height: 80 },
   },
 };

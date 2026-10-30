@@ -14,7 +14,7 @@ export const INDOOR_KIND_META: Record<IndoorKind, KindMeta> = {
     icon: <Square size={18} />,
     dockBgClass: "bg-route",
     dotClass: "bg-route",
-    hex: "#0068b4",
+    hex: "#0075be",
     defaultSize: { width: 120, height: 100 },
   },
   chodba: {
@@ -24,7 +24,7 @@ export const INDOOR_KIND_META: Record<IndoorKind, KindMeta> = {
     icon: <Route size={18} />,
     dockBgClass: "bg-ink-soft",
     dotClass: "bg-ink-soft",
-    hex: "#596679",
+    hex: "#5b6472",
     defaultSize: { width: 220, height: 60 },
   },
   vertikála: {
@@ -34,7 +34,7 @@ export const INDOOR_KIND_META: Record<IndoorKind, KindMeta> = {
     icon: <ArrowUpDown size={18} />,
     dockBgClass: "bg-stake",
     dotClass: "bg-stake",
-    hex: "#3f7a5c",
+    hex: "#47a23f",
     defaultSize: { width: 70, height: 70 },
   },
   dvere: {
@@ -44,7 +44,7 @@ export const INDOOR_KIND_META: Record<IndoorKind, KindMeta> = {
     icon: <DoorClosed size={18} />,
     dockBgClass: "bg-flag",
     dotClass: "bg-flag",
-    hex: "#b8660e",
+    hex: "#f07e3b",
     defaultSize: { width: 40, height: 20 },
   },
   ine: {
@@ -54,7 +54,7 @@ export const INDOOR_KIND_META: Record<IndoorKind, KindMeta> = {
     icon: <Tag size={18} />,
     dockBgClass: "bg-alarm",
     dotClass: "bg-alarm",
-    hex: "#b23a33",
+    hex: "#bd3a2f",
     defaultSize: { width: 100, height: 80 },
   },
 };
