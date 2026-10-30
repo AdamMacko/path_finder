@@ -13,7 +13,7 @@ const Sidebar = () => {
   const items = [
     { to: "/", label: "Prehľad", icon: LayoutDashboard },
     { to: "/building_complex", label: "Outdoor Mapa", icon: Map },
-    { to: "/my-firm", label: "Správa budov", icon: Building2Icon },
+    { to: "/buildings", label: "Správa budov", icon: Building2Icon },
     { to: "/pomocnik", label: "Pomocník", icon: LifeBuoy },
   ];
 
@@ -22,27 +22,27 @@ const Sidebar = () => {
       {sidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 bg-black/30 z-40"
+          className="fixed inset-0 bg-ink/25 z-40"
         />
       )}
 
       <aside
-        className={`h-[100dvh] bg-white border-r border-[#e6e6e6] shadow-sm z-50 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
+        className={`h-[100dvh] bg-surface border-r border-line z-50 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
         ${sidebarOpen ? "fixed left-0 top-0 w-[260px]" : "w-16"}`}
       >
-        <div className="pt-8 flex flex-col items-center h-[60px]">
-          {/* LOGO */}
-          <Image src="/logo.svg" alt="Logo" width={32} height={32} priority />
+        <div className="pt-7 pb-5 flex flex-col items-center gap-3 border-b border-line">
+          <Image src="/logo.svg" alt="Path Finder" width={28} height={28} priority />
 
           <button
             onClick={() => setSidebarOpen((p) => !p)}
-            className="w-12 py-3 flex items-center justify-center rounded-lg hover:bg-[#f3f6f9]"
+            aria-label={sidebarOpen ? "Zbaliť navigáciu" : "Rozbaliť navigáciu"}
+            className="w-10 h-9 flex items-center justify-center rounded-md text-ink-soft hover:bg-paper hover:text-route transition-colors"
           >
-            <Menu size={22} className="text-[#003a70]" />
+            <Menu size={18} />
           </button>
         </div>
 
-        <nav className="mt-10 flex flex-col gap-1 px-2">
+        <nav className="mt-4 flex flex-col gap-0.5 px-2">
           {items.map(({ to, label, icon: Icon }) => {
             const isActive =
               to === "/" ? pathname === "/" : pathname.startsWith(to);
@@ -52,18 +52,18 @@ const Sidebar = () => {
                 key={to}
                 href={to}
                 onClick={() => setSidebarOpen(false)}
-                className={`group relative flex items-center rounded-xl px-3.5 py-3 transition ${isActive
-                    ? "bg-[#0075be] text-[#FFFFFF]"
-                    : "text-[#777777] hover:bg-[#f3f6f9]"
+                className={`group relative flex items-center rounded-md px-3 py-2.5 text-sm transition-colors border-l-2 ${isActive
+                    ? "bg-route-soft text-route border-route font-medium"
+                    : "text-ink-soft hover:bg-paper hover:text-ink border-transparent"
                   }`}
               >
-                <div className="w-6 flex justify-center">
-                  <Icon size={18} />
+                <div className="w-6 flex justify-center shrink-0">
+                  <Icon size={17} />
                 </div>
 
                 <span
                   className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-out ${sidebarOpen
-                      ? "max-w-[160px] opacity-100 translate-x-0 mx-6 ml-10"
+                      ? "max-w-[160px] opacity-100 translate-x-0 ml-3"
                       : "max-w-0 opacity-0 -translate-x-2 ml-0"
                     }`}
                 >
@@ -71,7 +71,7 @@ const Sidebar = () => {
                 </span>
 
                 {!sidebarOpen && (
-                  <span className="pointer-events-none absolute left-full ml-3 top-1/2 -translate-y-1/2 rounded-lg bg-[#1f2937] px-3 py-1.5 text-xs text-white opacity-0 translate-x-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0 whitespace-nowrap shadow-lg">
+                  <span className="pointer-events-none absolute left-full ml-3 top-1/2 -translate-y-1/2 rounded-md bg-ink px-2.5 py-1.5 text-xs text-white opacity-0 translate-x-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0 whitespace-nowrap">
                     {label}
                   </span>
                 )}

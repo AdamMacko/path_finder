@@ -54,9 +54,9 @@ export function InfoPanel({ title, children }: InfoPanelProps) {
         onFocus={openNow}
         onBlur={closeSoon}
         onClick={() => setOpen((v) => !v)}
-        className="ml-2 inline-flex h-8 w-8 items-center justify-center rounded-full border bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black/30"
+        className="ml-2 inline-flex h-7 w-7 items-center justify-center rounded-full border border-line bg-surface text-ink-soft hover:border-route hover:text-route focus:outline-none focus:ring-2 focus:ring-route/30 transition-colors"
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M12 17v-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           <path d="M12 7h.01" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
           <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" strokeWidth="2" />
@@ -69,10 +69,10 @@ export function InfoPanel({ title, children }: InfoPanelProps) {
           aria-modal="false"
           onMouseEnter={openNow}
           onMouseLeave={closeSoon}
-          className="absolute z-[9999] left-0 top-[calc(100%+10px)] w-[360px] rounded-xl border bg-white p-4 shadow-xl"
+          className="absolute z-[9999] left-0 top-[calc(100%+8px)] w-[320px] rounded-md border border-line bg-surface p-4 shadow-[0_8px_24px_-8px_rgba(17,22,29,0.18)]"
         >
-          {title ? <div className="text-sm font-semibold mb-1">{title}</div> : null}
-          <div className="text-sm text-gray-600 space-y-2">{children}</div>
+          {title ? <div className="text-sm font-medium text-ink mb-1">{title}</div> : null}
+          <div className="text-sm text-ink-soft leading-relaxed space-y-2">{children}</div>
         </div>
       ) : null}
     </span>

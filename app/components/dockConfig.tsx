@@ -1,16 +1,40 @@
 "use client";
 
 import type { DockItemData } from "./dock";
-import {
-  VscHome,
-  VscArchive,
-  VscEdit,
-  VscSettingsGear,
-} from "react-icons/vsc";
+import { MousePointer2 } from "lucide-react";
+import type { KindMeta } from "../lib/annotationKinds";
 
-export const dockItems: DockItemData[] = [
-  { icon: <VscHome size={18} />, label: "Home", onClick: () => alert("Home!") },
-  { icon: <VscArchive size={18} />, label: "Archive", onClick: () => alert("Archive!") },
-  { icon: <VscEdit size={18} />, label: "Upraviť", onClick: () => alert("Upraviť!") },
-  { icon: <VscSettingsGear size={18} />, label: "Settings", onClick: () => alert("Settings!") },
-];
+export type Tool<K extends string> = "select" | "add-part" | `add-${K}`;
+
+type DockOptions<K extends string> = {
+  tool: Tool<K>;
+  setTool: (tool: Tool<K>) => void;
+  kinds: K[];
+  kindMeta: Record<K, KindMeta>;
+};
+
+const ACTIVE_RING = "ring-[3px] ring-ink ring-offset-2 ring-offset-paper";
+
+export function getDockItems<K extends string>({ tool, setTool, kinds, kindMeta }: DockOptions<K>): DockItemData[] {
+  const items: DockItemData[] = [
+    {
+      icon: <MousePointer2 size={18} className="text-white" />,
+      label: "Ukazovateľ",
+      onClick: () => setTool("select"),
+      className: `bg-ink ${tool === "select" ? ACTIVE_RING : ""}`,
+    },
+  ];
+
+  for (const kind of kinds) {
+    const meta = kindMeta[kind];
+    const toolName: Tool<K> = `add-${kind}`;
+    items.push({
+      icon: <span className="text-white">{meta.icon}</span>,
+      label: meta.addLabel,
+      onClick: () => setTool(toolName),
+      className: `${meta.dockBgClass} ${tool === toolName ? ACTIVE_RING : ""}`,
+    });
+  }
+
+  return items;
+}
