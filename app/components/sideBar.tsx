@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, LifeBuoy, Menu, Building2Icon, Map, Navigation } from "lucide-react";
+import { LayoutDashboard, LifeBuoy, Menu, Building2Icon, Map, Navigation, ShieldCheck } from "lucide-react";
 
 const Sidebar = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -12,10 +12,11 @@ const Sidebar = () => {
 
   const items = [
     { to: "/", label: "Prehľad", icon: LayoutDashboard },
-    { to: "/navigacia", label: "Navigácia", icon: Navigation },
+    { to: "/navigation", label: "Navigácia", icon: Navigation },
     { to: "/building_complex", label: "Outdoor Mapa", icon: Map },
     { to: "/buildings", label: "Správa budov", icon: Building2Icon },
-    { to: "/pomocnik", label: "Pomocník", icon: LifeBuoy },
+    { to: "/rules", label: "Pravidlá a profily", icon: ShieldCheck },
+    { to: "/help", label: "Pomocník", icon: LifeBuoy },
   ];
 
   return (
@@ -27,9 +28,12 @@ const Sidebar = () => {
         />
       )}
 
+      {/* Pevný stĺpec šírky 16 drží miesto v rozložení a natiahne sa na celú výšku stránky. Panel v ňom je „sticky“, takže
+          pri posúvaní dlhej stránky ostáva na celú výšku okna. Po rozbalení sa prekryje cez obsah (fixed). */}
+      <div className="w-16 shrink-0">
       <aside
-        className={`h-[100dvh] bg-surface border-r border-line z-50 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
-        ${sidebarOpen ? "fixed left-0 top-0 w-[260px]" : "w-16"}`}
+        className={`h-[100dvh] bg-surface border-r border-line z-50 transition-[width] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
+        ${sidebarOpen ? "fixed left-0 top-0 w-[260px]" : "sticky top-0 w-16"}`}
       >
         <div className="pt-7 pb-5 flex flex-col items-center gap-3 border-b border-line">
           <Image src="/logo.svg" alt="Path Finder" width={28} height={28} priority />
@@ -81,6 +85,7 @@ const Sidebar = () => {
           })}
         </nav>
       </aside>
+      </div>
     </>
   );
 };

@@ -74,7 +74,7 @@ export function Navigator({ data }: { data: MapData }) {
 
   const changeProfile = (id: string) => {
     invalidate();
-    startProfile(() => router.replace(`${pathname}?profil=${encodeURIComponent(id)}`, { scroll: false }));
+    startProfile(() => router.replace(`${pathname}?profile=${encodeURIComponent(id)}`, { scroll: false }));
   };
 
   async function findRoute() {

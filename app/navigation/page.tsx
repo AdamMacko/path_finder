@@ -8,12 +8,12 @@ import { Navigator } from "./navigator";
 export const metadata: Metadata = { title: "Navigácia – Path Finder" };
 
 /**
- * Prehliadač navigácie (F10). Dáta mapy pripravuje server pre zvolený profil (?profil=…),
+ * Prehliadač navigácie (F10). Dáta mapy pripravuje server pre zvolený profil (?profile=…),
  * takže interné body sa k návštevníkovi nedostanú (N6).
  * TODO: interné profily (údržbár…) budú vyžadovať prihlásenie – teraz ich môže zvoliť ktokoľvek.
  */
-export default async function NavigationPage({ searchParams }: { searchParams: Promise<{ profil?: string | string[] }> }) {
-  const { profil } = await searchParams;
+export default async function NavigationPage({ searchParams }: { searchParams: Promise<{ profile?: string | string[] }> }) {
+  const { profile: requested } = await searchParams;
   const loaded = loadVenue();
 
   if (!loaded.ok) {
@@ -27,7 +27,7 @@ export default async function NavigationPage({ searchParams }: { searchParams: P
   }
 
   const { venue, profiles } = loaded.index;
-  const profile = (typeof profil === "string" && profiles.get(profil)) || venue.profiles[0];
+  const profile = (typeof requested === "string" && profiles.get(requested)) || venue.profiles[0];
   if (!profile) {
     return (
       <div className="mx-auto max-w-2xl p-6">

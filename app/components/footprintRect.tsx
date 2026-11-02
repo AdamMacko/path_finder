@@ -9,9 +9,9 @@ const MIN_SIZE = 20;
 export type RectTier = "active" | "sibling" | "rest";
 
 const TIER_STYLE: Record<RectTier, { borderAlpha: number; fillAlpha: number; borderWidth: number }> = {
-  active: { borderAlpha: 1, fillAlpha: 0.18, borderWidth: 3 },
-  sibling: { borderAlpha: 0.85, fillAlpha: 0.1, borderWidth: 2 },
-  rest: { borderAlpha: 0.65, fillAlpha: 0.06, borderWidth: 2 },
+  active: { borderAlpha: 1, fillAlpha: 0.28, borderWidth: 3 },
+  sibling: { borderAlpha: 0.95, fillAlpha: 0.2, borderWidth: 2 },
+  rest: { borderAlpha: 0.9, fillAlpha: 0.14, borderWidth: 2 },
 };
 
 type Props = {
@@ -152,6 +152,8 @@ export function FootprintRect({ rect, color, tier, active, scale, editable, onSe
         borderWidth: tierStyle.borderWidth,
         borderColor: hexToRgba(color, tierStyle.borderAlpha),
         backgroundColor: hexToRgba(color, tierStyle.fillAlpha),
+        // Biely vonkajší okraj, aby bol obrys čitateľný aj na tmavých strechách fotky.
+        boxShadow: "0 0 0 1px rgba(255,255,255,0.75)",
       }}
     >
       {editable && active && (

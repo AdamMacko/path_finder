@@ -17,7 +17,11 @@ export type KindMeta = {
   defaultSize: { width: number; height: number };
 };
 
-export const ANNOTATION_KINDS: AnnotationKind[] = ["budova", "parkovisko", "vstup", "ine"];
+/**
+ * Typy, ktoré sa kreslia ako obdĺžniky. Vstupy sa kreslia ako úsečky na hranici budovy (samostatný nástroj);
+ * typ „vstup“ ostáva v modeli, aby sa zobrazili aj staré obdĺžnikové vstupy z predchádzajúcich verzií.
+ */
+export const ANNOTATION_KINDS: AnnotationKind[] = ["budova", "parkovisko", "ine"];
 
 export const KIND_META: Record<AnnotationKind, KindMeta> = {
   budova: {

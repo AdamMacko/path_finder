@@ -23,6 +23,55 @@ export type RectShape = {
 };
 
 /**
+ * Kalibrácia mierky: dva body na podklade, ktorých skutočná vzdialenosť je známa. Z nej vznikne
+ * prevod pixelov podkladu na metre (kap. 2.2.1) – metrický systém, v ktorom sa počíta trasa.
+ */
+export type Calibration = { a: Point; b: Point; meters: number };
+
+/** Metrov na pixel podkladu, alebo `null`, ak kalibrácia chýba či je neplatná. */
+export function metersPerPixel(c: Calibration | null | undefined): number | null {
+  if (!c || !(c.meters > 0)) return null;
+  const px = Math.hypot(c.b.x - c.a.x, c.b.y - c.a.y);
+  return px > 0 ? c.meters / px : null;
+}
+
+/**
+ * Úsečka na podklade. Slúži na vstupy do budov (outdoor mapa) a dvere (pôdorys podlažia) – prechody,
+ * ktoré ležia na hranici dvoch priestorov.
+ */
+export type LineShape = {
+  id: string;
+  nazov: string;
+  a: Point;
+  b: Point;
+  visible: boolean;
+  /** Vstup: id budovy, ku ktorej patrí. Dvere: id vstupu z exteriéru, ktorý prepájajú (iba na prízemí). */
+  ref: string | null;
+};
+
+/** Bod záujmu (cieľ navigácie). */
+export type PointItem = {
+  id: string;
+  nazov: string;
+  kategoria: string;
+  /** Interný bod vidí iba profil s oprávnením (N6). */
+  interny: boolean;
+  point: Point;
+};
+
+export type VerticalKind = "stairs" | "elevator" | "ramp" | "escalator";
+
+/** Doplnkové vlastnosti priestoru, ktoré sa nekreslia, ale ovplyvňujú trasu. */
+export type ItemMeta = {
+  /** Zóna z pravidiel prístupu (napr. výroba). */
+  zona?: string | null;
+  /** Priestor je bezbariérový; predvolene áno. */
+  bezbarierovy?: boolean;
+  /** Schodisko/výťah: spojenie s priestormi na ďalších podlažiach tej istej budovy. */
+  vertikala?: { skupina: string; typ: VerticalKind };
+};
+
+/**
  * Spoločný tvar pre čokoľvek, čo sa dá anotovať obdĺžnikmi na mapovom podklade —
  * budovu na outdoor fotke aj miestnosť na pôdoryse podlažia. Nad týmto tvarom
  * pracuje zdieľaná editorová komponenta (AnnotationWorkspace), nezávisle od
@@ -37,6 +86,7 @@ export type AnnotatedItem<K extends string = string> = {
   customColor: string | null;
   /** Či sa má objekt vôbec vykresliť na plátne (skrytie bez vymazania). */
   visible: boolean;
+  meta?: ItemMeta;
 };
 
 export type Priestor = AnnotatedItem<IndoorKind>;
@@ -48,6 +98,11 @@ export type Podlazie = {
   podkladObrazokUrl: string | null;
   svgContent: string | null;
   priestory: Priestor[];
+  /** Dvere medzi priestormi (úsečky). Chýba v dátach uložených pred zavedením tejto vlastnosti. */
+  dvere?: LineShape[];
+  poi?: PointItem[];
+  /** Mierka pôdorysu; bez nej sa nedá určiť dĺžka trasy v metroch. */
+  mierka?: Calibration | null;
 };
 
 export type Budova = AnnotatedItem<AnnotationKind> & {
@@ -60,6 +115,17 @@ export type Areal = {
   /** Zdroj outdoor podkladu (drone fotka / raster). Zatiaľ len jeden na areál. */
   podkladObrazokUrl: string | null;
   budovy: Budova[];
+  /**
+   * Hranica pochôdznej plochy areálu (polygón). Budovy sa z nej pri exporte odčítajú ako diery,
+   * takže ich netreba kresliť dvakrát. Chýba v dátach uložených pred zavedením tejto vlastnosti.
+   */
+  hranica?: Point[] | null;
+  /** Zakázané plochy (cesta pre autá, trávnik, …) – ďalšie diery v pochôdznej ploche. */
+  zakazane?: Point[][];
+  /** Vstupy do budov (úsečky na hranici budovy). */
+  vstupy?: LineShape[];
+  poi?: PointItem[];
+  mierka?: Calibration | null;
 };
 
 export function createId(prefix: string): string {
@@ -72,6 +138,11 @@ export function createEmptyAreal(): Areal {
     nazov: "Areál",
     podkladObrazokUrl: null,
     budovy: [],
+    hranica: null,
+    zakazane: [],
+    vstupy: [],
+    poi: [],
+    mierka: null,
   };
 }
 
@@ -127,7 +198,18 @@ export function createPodlazie(nazov: string, poradie: number): Podlazie {
     podkladObrazokUrl: null,
     svgContent: null,
     priestory: [],
+    dvere: [],
+    poi: [],
+    mierka: null,
   };
+}
+
+export function createLine(a: Point, b: Point, nazov: string, ref: string | null = null): LineShape {
+  return { id: createId("usecka"), nazov, a, b, visible: true, ref };
+}
+
+export function createPoi(point: Point, nazov: string, kategoria = "other"): PointItem {
+  return { id: createId("poi"), nazov, kategoria, interny: false, point };
 }
 
 /** Rohové body obdĺžnika v poradí NW, NE, SE, SW — pre export do dátového modelu (priestor = polygón). */

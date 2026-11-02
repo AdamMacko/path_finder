@@ -4,7 +4,11 @@ import type { KindMeta } from "./annotationKinds";
 
 export type IndoorKind = "miestnosť" | "chodba" | "vertikála" | "dvere" | "ine";
 
-export const INDOOR_KINDS: IndoorKind[] = ["miestnosť", "chodba", "vertikála", "dvere", "ine"];
+/**
+ * Typy, ktoré sa kreslia ako obdĺžniky. Dvere sa kreslia ako úsečky na hranici priestorov (samostatný nástroj);
+ * typ „dvere“ ostáva v modeli, aby sa zobrazili aj staré obdĺžnikové dvere z predchádzajúcich verzií.
+ */
+export const INDOOR_KINDS: IndoorKind[] = ["miestnosť", "chodba", "vertikála", "ine"];
 
 export const INDOOR_KIND_META: Record<IndoorKind, KindMeta> = {
   miestnosť: {

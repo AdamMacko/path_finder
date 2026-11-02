@@ -1,87 +1,118 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import { Building2, ChevronRight, Layers } from "lucide-react";
+import { Layers } from "lucide-react";
+import { BuildingsPanel } from "../components/buildingsPanel";
+import { FloorWorkspace } from "../components/floorWorkspace";
 import { useLocalStorage } from "../lib/useLocalStorage";
-import { createEmptyAreal } from "../lib/model";
+import { createEmptyAreal, createPodlazie, type Podlazie } from "../lib/model";
 import { createSeedAreal } from "../lib/seedData";
-import { KIND_META } from "../lib/annotationKinds";
+import { createEmptyPravidla, createSeedPravidla } from "../lib/rules";
+
+const byOrder = (a: Podlazie, b: Podlazie) => a.poradie - b.poradie;
 
 export default function BuildingsPage() {
-  const [areal, setAreal] = useLocalStorage("path-finder/areal", createEmptyAreal());
+  const [areal, setAreal, hydrated, history] = useLocalStorage("path-finder/areal", createEmptyAreal());
+  const [, setPravidla] = useLocalStorage("path-finder/pravidla", createEmptyPravidla());
+  const [buildingId, setBuildingId] = React.useState<string | null>(null);
+  const [floorId, setFloorId] = React.useState<string | null>(null);
+
   const buildings = areal.budovy.filter((b) => b.kind === "budova");
+  // Výber, ktorý v dátach už nie je (napr. po načítaní ukážkových dát), sa ignoruje.
+  const building = buildings.find((b) => b.id === buildingId) ?? null;
+  const floor = building?.podlazia.find((f) => f.id === floorId) ?? null;
+
+  function selectBuilding(id: string | null) {
+    setBuildingId(id);
+    // Pracovné okno nech nie je prázdne: otvorí sa najnižšie podlažie vybranej budovy.
+    const first = id ? [...(buildings.find((b) => b.id === id)?.podlazia ?? [])].sort(byOrder)[0] : undefined;
+    setFloorId(first?.id ?? null);
+  }
+
+  function updateFloor(id: string, updater: (f: Podlazie) => Podlazie) {
+    if (!building) return;
+    setAreal((a) => ({
+      ...a,
+      budovy: a.budovy.map((b) =>
+        b.id !== building.id ? b : { ...b, podlazia: b.podlazia.map((f) => (f.id === id ? updater(f) : f)) }
+      ),
+    }));
+  }
+
+  function addFloor(nazov?: string) {
+    if (!building) return;
+    // 0 = prízemie, 1 = prvé poschodie, záporné = suterén (rovnako ako `ordinal` v dátovom modeli).
+    const poradie = building.podlazia.length === 0 ? 0 : Math.max(...building.podlazia.map((f) => f.poradie)) + 1;
+    const defaultName = poradie === 0 ? "Prízemie" : poradie < 0 ? `Suterén ${-poradie}` : `${poradie}. poschodie`;
+    const created = createPodlazie(nazov ?? defaultName, poradie);
+    setAreal((a) => ({
+      ...a,
+      budovy: a.budovy.map((b) => (b.id === building.id ? { ...b, podlazia: [...b.podlazia, created] } : b)),
+    }));
+    setFloorId(created.id);
+  }
+
+  function deleteFloor(id: string) {
+    if (!building) return;
+    setAreal((a) => ({
+      ...a,
+      budovy: a.budovy.map((b) => (b.id === building.id ? { ...b, podlazia: b.podlazia.filter((f) => f.id !== id) } : b)),
+    }));
+    if (floorId === id) setFloorId(null);
+  }
+
+  function loadSeed() {
+    setAreal(createSeedAreal());
+    // Ukážkové priestory odkazujú na zónu „výroba“, preto sa načítajú aj ukážkové pravidlá.
+    setPravidla(createSeedPravidla());
+    setBuildingId(null);
+    setFloorId(null);
+  }
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6 max-w-5xl mx-auto">
-      <div className="flex items-start justify-between gap-4 pb-6 border-b border-line">
-        <div>
-          <h1 className="text-[1.75rem] font-semibold tracking-tight text-ink">Správa budov</h1>
-          <p className="text-sm text-ink-soft mt-1.5 max-w-xl">
-            Budovy identifikované na outdoor mape. Vyberte budovu a doplňte jej podlažia a pôdorysy.
-          </p>
-        </div>
-        <button
-          onClick={() => setAreal(createSeedAreal())}
-          className="shrink-0 text-xs text-ink-soft border border-line rounded-sm px-3 py-2 hover:text-route hover:border-route transition-colors"
-        >
-          Načítať ukážkové dáta
-        </button>
+    <div className="flex min-h-[100dvh] flex-col lg:flex-row">
+      <div className="min-w-0 flex-1">
+        {!hydrated ? null : building && floor ? (
+          // `key` zaručí, že sa pri zmene podlažia vynuluje výber, priblíženie aj nástroj.
+          <FloorWorkspace
+            key={floor.id}
+            floor={floor}
+            building={building}
+            entrances={(areal.vstupy ?? []).filter((v) => v.ref === building.id)}
+            onUpdate={(updater) => updateFloor(floor.id, updater)}
+            history={history}
+          />
+        ) : (
+          <div className="flex h-full min-h-[320px] items-center justify-center px-6 py-16">
+            <div className="max-w-sm text-center">
+              <Layers size={30} className="mx-auto mb-3 text-ink-soft" />
+              <p className="text-sm font-medium text-ink">
+                {building ? "Vyberte podlažie" : "Vyberte budovu"}
+              </p>
+              <p className="mt-1 text-sm text-ink-soft">
+                {building
+                  ? "V paneli vpravo vyberte podlažie alebo pridajte nové, a pracovné okno sa otvorí tu."
+                  : "V paneli vpravo vyberte budovu a potom jej podlažie. Pracovné okno s pôdorysom sa otvorí tu."}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
-      {buildings.length === 0 ? (
-        <div className="border border-line rounded-md bg-surface p-8 text-center">
-          <Building2 size={28} className="mx-auto text-ink-soft mb-3" />
-          <p className="text-sm font-medium text-ink">Zatiaľ žiadne budovy</p>
-          <p className="text-sm text-ink-soft mt-1 max-w-sm mx-auto">
-            Najprv označte budovy na outdoor mape areálu — odtiaľ sa tu automaticky objavia.
-          </p>
-          <div className="mt-4 flex items-center justify-center gap-3">
-            <Link
-              href="/building_complex"
-              className="inline-flex items-center gap-2 rounded-sm bg-route text-white px-4 py-2.5 text-sm font-medium hover:bg-route/90 transition-colors"
-            >
-              Prejsť na outdoor mapu
-            </Link>
-            <button
-              onClick={() => setAreal(createSeedAreal())}
-              className="inline-flex items-center gap-2 rounded-sm border border-line px-4 py-2.5 text-sm font-medium text-ink-soft hover:text-route hover:border-route transition-colors"
-            >
-              Načítať ukážkové dáta
-            </button>
-          </div>
-        </div>
-      ) : (
-        <ul className="space-y-2">
-          {buildings.map((b) => {
-            const color = b.customColor ?? KIND_META[b.kind].hex;
-            const floorCount = b.podlazia.length;
-            return (
-              <li key={b.id}>
-                <Link
-                  href={`/buildings/${b.id}`}
-                  className="flex items-center gap-4 border border-line rounded-md bg-surface px-5 py-4 hover:border-route/50 hover:bg-route-soft/40 transition-colors group"
-                >
-                  <span
-                    className="w-10 h-10 rounded-sm flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: color }}
-                  >
-                    <Building2 size={18} className="text-white" />
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-ink truncate">{b.nazov}</div>
-                    <div className="flex items-center gap-1.5 text-xs text-ink-soft mt-0.5">
-                      <Layers size={12} />
-                      {floorCount === 0 ? "Zatiaľ bez podlaží" : `${floorCount} ${floorCount === 1 ? "podlažie" : "podlaží"}`}
-                    </div>
-                  </div>
-                  <ChevronRight size={18} className="text-ink-soft shrink-0 group-hover:text-route transition-colors" />
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+      <div className="h-[55dvh] shrink-0 border-t border-line lg:sticky lg:top-0 lg:h-[100dvh] lg:w-[320px] lg:border-l lg:border-t-0">
+        <BuildingsPanel
+          buildings={buildings}
+          selectedBuildingId={building?.id ?? null}
+          selectedFloorId={floor?.id ?? null}
+          onSelectBuilding={selectBuilding}
+          onSelectFloor={setFloorId}
+          onAddFloor={addFloor}
+          onRenameFloor={(id, nazov) => updateFloor(id, (f) => ({ ...f, nazov }))}
+          onChangeOrder={(id, poradie) => updateFloor(id, (f) => ({ ...f, poradie }))}
+          onDeleteFloor={deleteFloor}
+          onLoadSeed={loadSeed}
+        />
+      </div>
     </div>
   );
 }

@@ -4,23 +4,15 @@ import * as React from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArrowLeft, Layers, Plus, Trash2, ChevronRight } from "lucide-react";
-import { AnnotationWorkspace } from "../../components/annotationWorkspace";
+import { FloorWorkspace } from "../../components/floorWorkspace";
 import { useLocalStorage } from "../../lib/useLocalStorage";
-import {
-  createEmptyAreal,
-  createPodlazie,
-  createPriestor,
-  createRect,
-  type Podlazie,
-  type RectShape,
-} from "../../lib/model";
-import { INDOOR_KINDS, INDOOR_KIND_META, type IndoorKind } from "../../lib/indoorKinds";
+import { createEmptyAreal, createPodlazie, type Podlazie } from "../../lib/model";
 
 export default function BuildingDetailPage() {
   const params = useParams();
   const buildingId = String(params.buildingId ?? "");
 
-  const [areal, setAreal] = useLocalStorage("path-finder/areal", createEmptyAreal());
+  const [areal, setAreal, hydrated, history] = useLocalStorage("path-finder/areal", createEmptyAreal());
   const [selectedFloorId, setSelectedFloorId] = React.useState<string | null>(null);
 
   const building = areal.budovy.find((b) => b.id === buildingId) ?? null;
@@ -59,6 +51,9 @@ export default function BuildingDetailPage() {
     if (selectedFloorId === floorId) setSelectedFloorId(null);
   }
 
+  // Kým sa neuložené dáta nenačítajú, budova by sa zdanlivo „nenašla“.
+  if (!hydrated) return null;
+
   if (!building) {
     return (
       <div className="w-full px-4 sm:px-6 lg:px-8 py-6 max-w-5xl mx-auto">
@@ -83,72 +78,13 @@ export default function BuildingDetailPage() {
           </button>
         </div>
 
-        <AnnotationWorkspace<IndoorKind>
-          title={floor.nazov}
-          subtitle={`Pôdorys podlažia budovy „${building.nazov}“.`}
-          imageUrl={floor.podkladObrazokUrl}
-          svgContent={floor.svgContent}
-          imageAlt={`Pôdorys — ${floor.nazov}`}
-          onImportImage={(dataUrl) => updateFloor(floor.id, (f) => ({ ...f, podkladObrazokUrl: dataUrl }))}
-          onImportSvg={(text) => updateFloor(floor.id, (f) => ({ ...f, svgContent: text }))}
-          items={floor.priestory}
-          kinds={INDOOR_KINDS}
-          kindMeta={INDOOR_KIND_META}
-          itemNoun="priestor"
-          itemsHeading="Priestory na podlaží"
-          emptyListHint="Zatiaľ nič. V docku dole vyberte typ priestoru (miestnosť, chodba, schodisko/výťah, dvere, iné) a kliknite na pôdorys."
-          emptyCanvasTitle="Zatiaľ bez pôdorysu"
-          emptyCanvasSubtitle="Importujte SVG alebo obrázok pôdorysu tohto podlažia."
-          onCreateItem={(kind, point) =>
-            updateFloor(floor.id, (f) => {
-              const meta = INDOOR_KIND_META[kind];
-              const count = f.priestory.filter((p) => p.kind === kind).length;
-              const priestor = createPriestor(point, `${meta.label} ${count + 1}`, kind, meta.defaultSize);
-              return { ...f, priestory: [...f.priestory, priestor] };
-            })
-          }
-          onAddPart={(itemId, point) =>
-            updateFloor(floor.id, (f) => ({
-              ...f,
-              priestory: f.priestory.map((p) =>
-                p.id === itemId ? { ...p, footprint: [...p.footprint, createRect(point)] } : p
-              ),
-            }))
-          }
-          onRectChange={(itemId, rectId, next: RectShape) =>
-            updateFloor(floor.id, (f) => ({
-              ...f,
-              priestory: f.priestory.map((p) =>
-                p.id !== itemId ? p : { ...p, footprint: p.footprint.map((r) => (r.id === rectId ? next : r)) }
-              ),
-            }))
-          }
-          onRename={(id, nazov) =>
-            updateFloor(floor.id, (f) => ({ ...f, priestory: f.priestory.map((p) => (p.id === id ? { ...p, nazov } : p)) }))
-          }
-          onColorChange={(id, color) =>
-            updateFloor(floor.id, (f) => ({
-              ...f,
-              priestory: f.priestory.map((p) => (p.id === id ? { ...p, customColor: color } : p)),
-            }))
-          }
-          onToggleVisible={(id) =>
-            updateFloor(floor.id, (f) => ({
-              ...f,
-              priestory: f.priestory.map((p) => (p.id === id ? { ...p, visible: p.visible === false } : p)),
-            }))
-          }
-          onDeletePart={(itemId, rectId) =>
-            updateFloor(floor.id, (f) => ({
-              ...f,
-              priestory: f.priestory
-                .map((p) => (p.id !== itemId ? p : { ...p, footprint: p.footprint.filter((r) => r.id !== rectId) }))
-                .filter((p) => p.footprint.length > 0),
-            }))
-          }
-          onDeleteItem={(id) =>
-            updateFloor(floor.id, (f) => ({ ...f, priestory: f.priestory.filter((p) => p.id !== id) }))
-          }
+        <FloorWorkspace
+          key={floor.id}
+          floor={floor}
+          building={building}
+          entrances={(areal.vstupy ?? []).filter((v) => v.ref === building.id)}
+          onUpdate={(updater) => updateFloor(floor.id, updater)}
+          history={history}
         />
       </div>
     );
