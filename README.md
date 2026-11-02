@@ -1,6 +1,6 @@
 # Path Finder
 
-Webová aplikácia na **multikriteriálnu navigáciu v budovách a areáli**, ktorá spája vonkajšie (outdoor) a vnútorné (indoor) prostredie do jedného navigačného modelu. Vzniká ako súčasť diplomovej práce a je určená na reálne nasadenie vo firemnom areáli (ANDRITZ Slovakia, Humenné).
+Webová aplikácia na **multikriteriálnu navigáciu v budovách a areáli**, ktorá spája vonkajšie (outdoor) a vnútorné (indoor) prostredie do jedného navigačného modelu.
 
 > **Stav projektu:** prebieha vývoj. Hotový je editor areálu a administrácia (frontend). Generovanie navigačného grafu a výpočet trasy (`/api/route`) sú ďalšou etapou.
 
@@ -94,10 +94,4 @@ Zatiaľ sa dáta ukladajú v **localStorage prehliadača** (`path-finder/areal`,
 - [ ] ukladanie na serveri (MySQL), prihlásenie a roly
 - [ ] pilotné nasadenie a vyhodnotenie
 
-## Dôvernosť dát
 
-Reálne plány, fotografie a pravidlá firmy **nepatria do verejného repozitára**. Ukážkové dáta v kóde musia ostať fiktívne.
-
-## Autor
-
-Adam Macko, diplomová práca.
