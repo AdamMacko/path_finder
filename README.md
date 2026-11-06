@@ -2,6 +2,8 @@
 
 Webová aplikácia na **multikriteriálnu navigáciu v budovách a areáli**, ktorá spája vonkajšie (outdoor) a vnútorné (indoor) prostredie do jedného navigačného modelu. Vzniká ako súčasť diplomovej práce.
 
+> **Stav projektu:** prebieha vývoj. Hotový je editor areálu a administrácia (frontend). Generovanie navigačného grafu a výpočet trasy (`/api/route`) sú ďalšou etapou.
+
 ## Čo aplikácia robí
 
 Administrátor v editore vytvorí digitálnu podobu areálu. Z nej sa následne počíta trasa podľa **profilu používateľa** (návštevník, zamestnanec, vozíčkar, …), ktorý určuje, ktoré priestory sú prístupné (tvrdé obmedzenia) a čo sa pri hľadaní trasy preferuje (mäkké náklady).
