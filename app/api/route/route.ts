@@ -1,4 +1,5 @@
 import type { RouteRequest, RouteResponse, Waypoint } from "@/lib/api/types";
+import { mockRoute } from "@/lib/server/mockRoute";
 import { loadVenue } from "@/lib/server/venueStore";
 
 /**
@@ -43,7 +44,8 @@ export async function POST(request: Request) {
   if (!known(req.to)) return json({ status: "error", message: "Neznámy cieľ." }, 400);
   if (req.time !== undefined && Number.isNaN(Date.parse(req.time))) return json({ status: "error", message: "Neplatný čas." }, 400);
 
-  return json({ status: "error", message: "Výpočet trasy ešte nie je implementovaný (generovanie grafu a routing – kroky 2 a 3)." }, 501);
+  // Zástupná odpoveď, kým nie je hotový graf a A* (kroky 2 a 3) – pozri lib/server/mockRoute.ts.
+  return json(mockRoute(req as RouteRequest, index), 200);
 }
 
 const json = (body: RouteResponse, status: number) => Response.json(body, { status });

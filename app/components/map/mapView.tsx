@@ -16,6 +16,7 @@ import {
   polygonPath,
   visibleLevels,
 } from "./mapStyle";
+import { RouteLayer, SearchPulse } from "./routeLayer";
 import { usePanZoom } from "./usePanZoom";
 
 export type MapMarker = { level: string; point: Vec2 };
@@ -29,11 +30,13 @@ type Props = {
   from?: MapMarker | null;
   to?: MapMarker | null;
   route?: RouteLeg[] | null;
+  /** Trasa sa práve počíta – okolo štartu pulzujú kruhy. */
+  searching?: boolean;
 };
 
 const PAD = 4;
 
-export function MapView({ data, ordinal, onOrdinalChange, selection, onSelect, from, to, route }: Props) {
+export function MapView({ data, ordinal, onOrdinalChange, selection, onSelect, from, to, route, searching }: Props) {
   const svgRef = React.useRef<SVGSVGElement | null>(null);
   const [minX, minY, maxX, maxY] = data.bounds;
   const home = React.useMemo(
@@ -156,21 +159,18 @@ export function MapView({ data, ordinal, onOrdinalChange, selection, onSelect, f
 
         {measured && (
           <>
-            {/* Trasa – iba úseky na aktívnych podlažiach. */}
-            {route
-              ?.filter((leg) => activeIds.has(leg.level))
-              .map((leg, i) => {
-                const points = leg.points.map((p) => p.join(",")).join(" ");
-                return (
-                  <g key={i} pointerEvents="none">
-                    <polyline points={points} fill="none" stroke="#ffffff" strokeWidth={9} strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-                    <polyline points={points} fill="none" stroke={COLORS.primary} strokeWidth={5} strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-                    {leg.transition && (
-                      <TransitionBadge at={leg.points[leg.points.length - 1]} r={px(10)} text={ordinalLabel(levelById.get(leg.transition.toLevel)?.ordinal ?? 0)} />
-                    )}
-                  </g>
-                );
-              })}
+            {searching && from && activeIds.has(from.level) && <SearchPulse at={from.point} r={px(9)} />}
+
+            {/* Trasa – iba úseky na aktívnych podlažiach, kreslí sa postupne od štartu. */}
+            {route && (
+              <RouteLayer
+                route={route}
+                activeIds={activeIds}
+                levelById={levelById}
+                px={px}
+                onFollow={(level) => onOrdinalChange(levelById.get(level)?.ordinal ?? 0)}
+              />
+            )}
 
             {/* Popisy priestorov – skryjú sa, ak sa pri aktuálnom zoome do priestoru nezmestia. */}
             <g pointerEvents="none" fontSize={fontSize} fontFamily="var(--font-geist-sans), sans-serif" textAnchor="middle" dominantBaseline="central">
@@ -258,17 +258,6 @@ function Marker({ at, r, color }: { at: Vec2; r: number; color: string }) {
     <g pointerEvents="none">
       <circle cx={at[0]} cy={at[1]} r={r} fill={color} stroke="#ffffff" strokeWidth={3} vectorEffect="non-scaling-stroke" />
       <circle cx={at[0]} cy={at[1]} r={r * 0.35} fill="#ffffff" />
-    </g>
-  );
-}
-
-function TransitionBadge({ at, r, text }: { at: Vec2; r: number; text: string }) {
-  return (
-    <g>
-      <circle cx={at[0]} cy={at[1]} r={r} fill={COLORS.primaryDark} stroke="#ffffff" strokeWidth={2} vectorEffect="non-scaling-stroke" />
-      <text x={at[0]} y={at[1]} fontSize={r} fill="#ffffff" textAnchor="middle" dominantBaseline="central" fontWeight={700}>
-        {text}
-      </text>
     </g>
   );
 }

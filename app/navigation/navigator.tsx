@@ -4,9 +4,12 @@ import * as React from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { ArrowUpDown, Loader2, MapPin, Navigation, X } from "lucide-react";
 import type { MapData, RouteResponse, Waypoint } from "@/lib/api/types";
+import { motion } from "motion/react";
 import { AlertBox } from "../components/allertsBox";
 import { MapView, type MapMarker } from "../components/map/mapView";
-import { COLORS, SPACE_TYPE_LABEL, VERTICAL_TYPE_LABEL, levelLabel, poiCategoryLabel } from "../components/map/mapStyle";
+import { ProfileComparison } from "./profileComparison";
+import { routeSteps } from "./routeSteps";
+import { COLORS, SPACE_TYPE_LABEL, levelLabel, poiCategoryLabel } from "../components/map/mapStyle";
 
 /* ---------- Pomocné funkcie nad dátami mapy ---------- */
 
@@ -29,6 +32,9 @@ function resolveWaypoint(data: MapData, w: Waypoint | null) {
   }
   return { title: "Bod na mape", level: w.level, point: w.point };
 }
+
+/** Najkratšia doba zobrazenia animácie hľadania. */
+const MIN_SEARCH_MS = 900;
 
 const formatDistance = (m: number) => (m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${Math.round(m)} m`);
 const formatDuration = (s: number) => (s < 60 ? `${Math.round(s)} s` : `${Math.round(s / 60)} min`);
@@ -82,12 +88,15 @@ export function Navigator({ data }: { data: MapData }) {
     setLoading(true);
     setResult(null);
     try {
+      // Krátka pauza, aby bolo hľadanie vidno aj pri okamžitej odpovedi servera.
+      const pause = new Promise((r) => setTimeout(r, MIN_SEARCH_MS));
       const res = await fetch("/api/route", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ profile: data.profile, from, to, time: time ? new Date(time).toISOString() : undefined }),
       });
       const body = (await res.json()) as RouteResponse;
+      await pause;
       setResult(body);
       if (body.status === "ok" && body.legs[0]) showLevel(body.legs[0].level);
     } catch {
@@ -176,26 +185,31 @@ export function Navigator({ data }: { data: MapData }) {
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0075be] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#003a70] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? <Loader2 size={16} className="animate-spin" /> : <Navigation size={16} />}
-            Nájsť trasu
+            {loading ? "Hľadám trasu…" : "Nájsť trasu"}
           </button>
 
           {result?.status === "ok" && (
-            <div className="rounded-xl border border-slate-200 p-4">
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="rounded-xl border border-slate-200 p-4">
               <div className="flex items-baseline gap-3">
                 <span className="text-2xl font-bold text-slate-900">{formatDuration(result.duration)}</span>
                 <span className="text-sm text-slate-500">{formatDistance(result.distance)}</span>
               </div>
-              <ol className="mt-3 space-y-1 text-sm text-slate-600">
-                {result.legs.map((leg, i) => (
+              <ol className="mt-3 space-y-0.5 text-sm text-slate-600">
+                {routeSteps(result.legs, levelById, toInfo?.title ?? "").map((step, i) => (
                   <li key={i}>
-                    <button type="button" onClick={() => showLevel(leg.level)} className="hover:text-[#0075be]">
-                      {levelLabel(levelById.get(leg.level))}
-                      {leg.transition && ` → ${VERTICAL_TYPE_LABEL[leg.transition.type]} → ${levelLabel(levelById.get(leg.transition.toLevel))}`}
+                    <button type="button" onClick={() => showLevel(step.level)} className="w-full rounded-md px-1.5 py-1 text-left hover:bg-slate-50 hover:text-[#0075be]">
+                      <span className="mr-2 inline-block w-4 text-right text-xs text-slate-400">{i + 1}.</span>
+                      {step.text}
                     </button>
                   </li>
                 ))}
               </ol>
-            </div>
+              {from && to && (
+                <div className="mt-4 border-t border-slate-100 pt-3">
+                  <ProfileComparison profiles={data.profiles} current={data.profile} from={from} to={to} time={time ? new Date(time).toISOString() : undefined} />
+                </div>
+              )}
+            </motion.div>
           )}
           {result?.status === "unreachable" && (
             <AlertBox severity="warning" title="Cieľ je nedostupný">
@@ -252,6 +266,7 @@ export function Navigator({ data }: { data: MapData }) {
           from={marker(fromInfo)}
           to={marker(toInfo)}
           route={result?.status === "ok" ? result.legs : null}
+          searching={loading}
         />
       </div>
     </div>

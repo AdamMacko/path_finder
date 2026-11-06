@@ -113,7 +113,7 @@ export function createSeedAreal(): Areal {
   return {
     id: "seed-areal",
     nazov: "Testovací areál",
-    podkladObrazokUrl: placeholderSvgDataUrl(1400, 900, "Ukážková fotka areálu"),
+    podkladObrazokUrl: "/maps/outdoor-areal.svg",
     budovy: [hlavnaBudova, dielna, sklad, parkovisko],
     hranica: [
       { x: 60, y: 90 },

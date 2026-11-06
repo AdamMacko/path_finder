@@ -4,6 +4,8 @@ import * as React from "react";
 import Link from "next/link";
 import { ArrowRight, Building2, CheckCircle2, DoorOpen, Layers, MapPin, ShieldCheck, Users } from "lucide-react";
 import { AlertBox } from "./components/allertsBox";
+import { ExportPanel } from "./components/exportPanel";
+import { OnboardingBanner } from "./components/onboardingBanner";
 import { InfoPanel } from "./components/infoPanel";
 import { checkReadiness, type Check } from "./lib/checks";
 import { createEmptyAreal } from "./lib/model";
@@ -57,6 +59,8 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       </div>
+
+      <OnboardingBanner />
 
       {hydrated && errors.length > 0 && (
         <div className="mb-8">
@@ -152,6 +156,8 @@ export default function AdminDashboardPage() {
               Priechodnosť areálu pre jednotlivé profily sa zobrazí po zapnutí výpočtu trasy.
             </p>
           </div>
+
+          <ExportPanel areal={areal} pravidla={pravidla} />
 
           <div className="bg-route-dark p-6 rounded-md">
             <h3 className="text-sm font-medium text-white mb-2">Vyskúšať navigáciu</h3>
